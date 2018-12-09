@@ -120,13 +120,9 @@ def validate(model, device, validate_loader, optimizer, criterion, epoch):
             labels = labels.to(device)
             labels = labels.long()
             labels = labels.view(-1, len(labels))[0]
-            # optimizer.zero_grad()
             outputs = model(images)
             outputs = outputs.float()
             loss = criterion(outputs, labels)
-            # loss_list.append(loss)
-            # loss.backward()
-            # optimizer.step()
             loss_list.append(loss.item())
             if i % 10 == 0:
                 print('Validation Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
@@ -134,8 +130,6 @@ def validate(model, device, validate_loader, optimizer, criterion, epoch):
                            100. * i / len(validate_loader), loss.item()))
 
         return loss_list
-    # plt.plot(loss_list)
-    # plt.show()
 
 
 # %%-----------------------------------------------------------------------
@@ -285,10 +279,6 @@ def main():
                         validation_loss = validation_loss + val_loss
                         mean_training_loss = mean_training_loss + [np.mean(train_loss)]
                         mean_validation_loss = mean_validation_loss + [np.mean(val_loss)]
-
-                        #         for i in validation_loss:
-                        #             if val_loss>i:
-                        #                 print(val_loss)
                         test(model, device, test_loader)
 
                     fig1 = plt.figure()
