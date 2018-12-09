@@ -1,29 +1,32 @@
+#%%-----------------------------------------------------------------------
 # Loading required packages
-import numpy as np  # For storing data as numpy arrays
 import os  # For handling directories
-from PIL import Image  # For handling the images
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg  # Plotting
-from sklearn.model_selection import train_test_split
 import matplotlib.backends.backend_pdf
-#%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np  # For storing data as numpy arrays
+
+#%%-----------------------------------------------------------------------
 
 # importing torch packages
 import torch
-import torchvision
-from torch.autograd import Variable
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
+from PIL import Image  # For handling the images
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset
 
 
+# %matplotlib inline
+# %%-----------------------------------------------------------------------
+
+
+# %%-----------------------------------------------------------------------
 # specify the class for preprocessing the data
 class DatasetProcessing(Dataset):
-    '''
+    """
     This function is used to initialise the class variables - transform, data, target
-    '''
+
+    """
 
     def __init__(self, data, target, transform=None):
         self.transform = transform
@@ -36,6 +39,8 @@ class DatasetProcessing(Dataset):
     def __len__(self):
         return len(list(self.data))
 
+
+# %%-----------------------------------------------------------------------
 
 # specify the model class
 class CNN(nn.Module):
@@ -77,7 +82,7 @@ class CNN(nn.Module):
         return out
 
 
-# -----------------------------------------------------------------------------------
+# %%-----------------------------------------------------------------------
 # Train the Model
 
 def train(model, device, train_loader, optimizer, criterion, epoch):
@@ -108,6 +113,8 @@ def train(model, device, train_loader, optimizer, criterion, epoch):
     # plt.show()
 
 
+# %%-----------------------------------------------------------------------
+
 def validate(model, device, validate_loader, optimizer, criterion, epoch):
     model.eval()
     loss_list = []
@@ -135,6 +142,8 @@ def validate(model, device, validate_loader, optimizer, criterion, epoch):
     # plt.show()
 
 
+# %%-----------------------------------------------------------------------
+
 def test(model, device, test_loader):
     # Test the model
     model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
@@ -153,6 +162,8 @@ def test(model, device, test_loader):
 
         print('Test Accuracy of the model on the 3000 test images: {} %'.format(100 * correct / total))
 
+
+# %%-----------------------------------------------------------------------
 
 def main():
     # specify device and choose gpu if it's available
@@ -305,7 +316,7 @@ def main():
                     pdf.close()
 
 
+# %%-----------------------------------------------------------------------
+
 if __name__ == '__main__':
     main()
-
-
