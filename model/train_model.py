@@ -288,7 +288,7 @@ def main():
                     plt.plot(training_loss)
                     plt.plot(validation_loss)
                     plt.xlabel("batch samples", fontsize=20)
-                    plt.ylabel("validation loss", fontsize=20)
+                    plt.ylabel("loss", fontsize=20)
                     plt.legend(['training loss', 'validation loss'], loc='upper right', fontsize=20)
                     plt.title("batch-wise training and validation loss for batch size=" + str(BATCH_SIZE)
                               + ", lr=" + str(LEARNING_RATE) +
@@ -301,7 +301,7 @@ def main():
                     plt.plot(mean_training_loss)
                     plt.plot(mean_validation_loss)
                     plt.xlabel("epochs", fontsize=20)
-                    plt.ylabel("mean validation loss", fontsize=20)
+                    plt.ylabel("mean loss", fontsize=20)
                     plt.legend(['mean training loss', 'mean validation loss'], loc='upper right', fontsize=20)
                     # plt.show()
                     plt.title("epoch-wise mean training and validation loss for batch size=" + str(BATCH_SIZE) +
