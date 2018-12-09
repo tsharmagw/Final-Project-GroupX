@@ -284,14 +284,14 @@ def main():
                     fig1 = plt.figure()
                     plt.plot(training_loss)
                     plt.plot(validation_loss)
-                    # plt.show()
+
                     fig1.savefig("batchwise_training_validation_loss_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
                                  "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
 
                     fig2 = plt.figure()
                     plt.plot(mean_training_loss)
                     plt.plot(mean_validation_loss)
-                    # plt.show()
+
                     fig2.savefig(
                         "epochwise_mean_training_validation_loss_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
                         "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
