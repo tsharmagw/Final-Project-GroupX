@@ -4,6 +4,7 @@ import boto3
 import time
 import subprocess
 import os
+import traceback
 
 def get_message_from_queue(Queue_url,sqs):
 	response = sqs.receive_message(
@@ -37,9 +38,13 @@ if __name__=='__main__':
 	while(success):
 		try:
 			Queue_url = sqs.get_queue_url(QueueName=queue_name)['QueueUrl']
+
 			handle=get_message_from_queue(Queue_url,sqs)
 			subprocess.call(['/home/script.sh']) 
+			print("Image Predicted")
 			response = sqs.delete_message(QueueUrl=Queue_url,ReceiptHandle=handle)		
+			print("Message Deleted")
 		except Exception as e:
 			time.sleep(1)
-			print("No message",e)
+			# traceback.print_exc()
+			print("No message",str(e))
