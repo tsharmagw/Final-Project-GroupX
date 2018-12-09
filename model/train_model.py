@@ -1,6 +1,8 @@
 #%%-----------------------------------------------------------------------
 # Loading required packages
 import os  # For handling directories
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.backends.backend_pdf
 import matplotlib.pyplot as plt
 import numpy as np  # For storing data as numpy arrays
@@ -16,7 +18,9 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
 # %matplotlib inline
 
+
 # %%-----------------------------------------------------------------------
+#os.system("wget https://s3.amazonaws.com/dataml2/leapGestRecog.rar")
 # specify the class for preprocessing the data
 class DatasetProcessing(Dataset):
     """
@@ -101,7 +105,7 @@ def train(model, device, train_loader, optimizer, criterion, epoch):
                 epoch, i * len(images), len(train_loader.dataset),
                        100. * i / len(train_loader), loss.item()))
     # Save the model checkpoint
-    torch.save(model.state_dict(), './model/model_trained.pth')
+    torch.save(model.state_dict(), '../model/model_trained.pth')
 
     return loss_list
 
@@ -163,7 +167,7 @@ def main():
     lookup = dict()
     reverselookup = dict()
     count = 0
-    for j in os.listdir('./data/leapGestRecog/00/'):
+    for j in os.listdir('../data/leapGestRecog/00/'):
         if not j.startswith('.'):  # If running this code locally, this is to
             # ensure you aren't reading in hidden folders
             lookup[j] = count
@@ -175,13 +179,13 @@ def main():
     label_data = []
     imagecount = 0  # total Image count
     for i in range(0, 10):  # Loop over the ten top-level folders
-        for j in os.listdir('./data/leapGestRecog/0' + str(i) + '/'):
+        for j in os.listdir('../data/leapGestRecog/0' + str(i) + '/'):
             if not j.startswith('.'):  # Again avoid hidden folders
                 count = 0  # To tally images of a given gesture
                 # loop over the images
                 # read in and convert to greyscale
-                for k in os.listdir('./data/leapGestRecog/0' + str(i) + '/' + j + '/'):
-                    img = Image.open('./data/leapGestRecog/0' +
+                for k in os.listdir('../data/leapGestRecog/0' + str(i) + '/' + j + '/'):
+                    img = Image.open('../data/leapGestRecog/0' +
                                      str(i) + '/' + j + '/' + k).convert('L')
                     img = img.resize((320, 120))
                     arr = np.array(img)
@@ -215,7 +219,7 @@ def main():
     print(x_test.shape)
     print(y_test.shape)
 
-    batch_size_list = [64]
+    batch_size_list = [128,64,32]
 
     for BATCH_SIZE in batch_size_list:
 
@@ -240,8 +244,8 @@ def main():
         test_loader = torch.utils.data.DataLoader(data_test, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         # specify the number of epochs and learning rate
-        learning_rate_list = [0.01]
-        optimizer_functions_list = ['Adam']
+        learning_rate_list = [0.1, 0.01, 0.001]
+        optimizer_functions_list = ['Adam', 'Adadelta']
 
         for LEARNING_RATE in learning_rate_list:
 
@@ -263,7 +267,7 @@ def main():
                 elif OPTIMIZER == 'RMSProp':
                     optimizer = torch.optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
 
-                number_epochs_list = [2]
+                number_epochs_list = [2, 5, 10]
 
                 for NUM_EPOCHS in number_epochs_list:
                     training_loss = []
@@ -280,17 +284,29 @@ def main():
                         mean_validation_loss = mean_validation_loss + [np.mean(val_loss)]
                         test(model, device, test_loader)
 
-                    fig1 = plt.figure()
+                    fig1 = plt.figure(figsize=(12, 8))
                     plt.plot(training_loss)
                     plt.plot(validation_loss)
-
+                    plt.xlabel("batch samples", fontsize=20)
+                    plt.ylabel("validation loss", fontsize=20)
+                    plt.legend(['training loss', 'validation loss'], loc='upper right', fontsize=20)
+                    plt.title("batch-wise training and validation loss for batch size=" + str(BATCH_SIZE)
+                              + ", lr=" + str(LEARNING_RATE) +
+                              ", optimizer=" + str(OPTIMIZER) + ", num_epochs=" + str(NUM_EPOCHS), fontsize=15)
+                    # plt.show()
                     fig1.savefig("batchwise_training_validation_loss_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
                                  "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
 
-                    fig2 = plt.figure()
+                    fig2 = plt.figure(figsize=(12, 8))
                     plt.plot(mean_training_loss)
                     plt.plot(mean_validation_loss)
-
+                    plt.xlabel("epochs", fontsize=20)
+                    plt.ylabel("mean validation loss", fontsize=20)
+                    plt.legend(['mean training loss', 'mean validation loss'], loc='upper right', fontsize=20)
+                    # plt.show()
+                    plt.title("epoch-wise mean training and validation loss for batch size=" + str(BATCH_SIZE) +
+                              ", lr=" + str(LEARNING_RATE) +
+                              ", optimizer=" + str(OPTIMIZER) + ", num_epochs=" + str(NUM_EPOCHS), fontsize=15)
                     fig2.savefig(
                         "epochwise_mean_training_validation_loss_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
                         "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
