@@ -250,17 +250,17 @@ def main():
                 model = CNN().to(device)
                 criterion = nn.CrossEntropyLoss()
 
-                if (OPTIMIZER == 'SGD'):
+                if OPTIMIZER == 'SGD':
                     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
-                elif (OPTIMIZER == 'ASGD'):
+                elif OPTIMIZER == 'ASGD':
                     optimizer = torch.optim.ASGD(model.parameters(), lr=LEARNING_RATE)
-                elif (OPTIMIZER == 'Adam'):
+                elif OPTIMIZER == 'Adam':
                     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-                elif (OPTIMIZER == 'Adagrad'):
+                elif OPTIMIZER == 'Adagrad':
                     optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
-                elif (OPTIMIZER == 'Adadelta'):
+                elif OPTIMIZER == 'Adadelta':
                     optimizer = torch.optim.Adadelta(model.parameters(), lr=LEARNING_RATE)
-                elif (OPTIMIZER == 'RMSProp'):
+                elif OPTIMIZER == 'RMSProp':
                     optimizer = torch.optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
 
                 number_epochs_list = [2]
