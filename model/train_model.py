@@ -14,11 +14,7 @@ import torchvision.transforms as transforms
 from PIL import Image  # For handling the images
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
-
-
 # %matplotlib inline
-# %%-----------------------------------------------------------------------
-
 
 # %%-----------------------------------------------------------------------
 # specify the class for preprocessing the data
