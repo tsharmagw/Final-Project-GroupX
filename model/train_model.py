@@ -262,7 +262,6 @@ def main():
                     optimizer = torch.optim.Adadelta(model.parameters(), lr=LEARNING_RATE)
                 elif (OPTIMIZER == 'RMSProp'):
                     optimizer = torch.optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
-                # optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
                 number_epochs_list = [2]
 
