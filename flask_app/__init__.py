@@ -35,30 +35,24 @@ def upload_file():
             data = open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'rb')
             response=s3.Bucket(bucket).put_object(Key=filename,Body=data)
             return redirect(url_for('upload_file',filename=filename))
-    return  '''<!doctype html>
-    <title>Face System</title>
-    <h1>Upload a picture and see if it's a picture of database!</h1>
-    <form method="POST" enctype="multipart/form-data">
-      <input type="file" name="file">
-      <input type="submit" value="Upload">
-    </form>
-    '''
+    return  render_template('index.html')
 
 
 @app.route('/output')
 def show_prediction():
     download_data()
-    download_path='/home/ubuntu/flask_app/static'
+    download_path='/home/ubuntu/MachineLearning2_Project/flask_app/static'
     files = [f for f in os.listdir(download_path) if os.path.isfile(os.path.join(download_path, f))]
+    print(files)
     return render_template(
                 'results.html', results=files)
 
 
 def download_data():
-    bucket='flaskdataml2'
+    bucket='flaskdataml2output'
     s3_client=boto3.client('s3')
     s3=boto3.resource('s3')
-    download_path = '/home/ubuntu/flask_app/static'
+    download_path = '/home/ubuntu/MachineLearning2_Project/flask_app/static'
     if(os.path.isdir(download_path)):
         shutil.rmtree(download_path)
     os.mkdir(download_path)
@@ -69,4 +63,6 @@ def download_data():
         s3.Bucket(bucket).download_file(key['Key'], download_path+"/"+key['Key'])
 
 if __name__ == "__main__":
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.debug = True
     app.run(host="0.0.0.0", port=80)

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Information Retrieval Homepage</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link type="text/css" href="{{ url_for('static',filename='styles/form.css') }}" rel="stylesheet">
+   
+  </head>
+  
+  <body>
+    <header>
+      <nav>
+        <ul id="nav_bar">
+          <li class="nav-links" id=""><a href="output">Output</a></li>
+          <li class="nav-links"><a href="#"></a></li>
+	</ul>   
+      </nav>  
+    </header>  
+    
+      
+    <div class="google">
+      <a href="#" id="google_logo"><img width=200 height=200 src="{{ url_for('static',filename='images/logo.jpeg') }}" alt="Photo Not Found"/></a>
+    </div>
+    
+    <!-- FORM SEARCH -->  
+    <div class="form">  
+      <form  method="POST"  enctype="multipart/form-data">
+        <input type="file" name="file">
+      	<input type="submit" value="Upload">
+      </form>
+    </div>  
+    
+    <!-- BUTTONS -->
+      <div class= "buttons">  
+      <!-- <input type="submit" value="Google Search" id="google_search">
+      <input type="submit" value="I'm Feeling Lucky" id="im_feeling_lucky"> -->
+    </div>
+    <div class= "buttons">  
+      <!-- <input type="submit" value="Google Search" id="google_search">
+      <input type="submit" value="I'm Feeling Lucky" id="im_feeling_lucky"> -->
+    </div>
+    
+
+    <!-- FOOTER -->
+    <footer>
+        <ul class="footer-left">
+          <li><a href="#">Advertising</a></li>
+          <li><a href="#">Business</a></li>
+          <li><a href="#">About</a></li> 
+        </ul>
+        <ul class="footer-right">    
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Settings</a></li>
+        </ul>       
+    </footer>      
+  </body>
+</html>

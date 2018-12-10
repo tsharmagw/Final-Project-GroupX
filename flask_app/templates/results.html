@@ -6,12 +6,14 @@
 </head>
 <body>
     {% if results %}
-        <table>
+        <table width="500">
             <tbody>
+		<th>Label</th>
+                <th>Image</th>
             {% for img_name in results %}
                 <tr>
-                    <td>{{ img_name }}</td>
-		    <td><img src="static/{{ img_name }}" alt="Not Found" width="100" height="100"></td>
+                    <td>{{ img_name[img_name.rfind("-")+1:img_name.rfind(".")] }}</td>
+		    <td><img src="static/{{ img_name }}" alt="Not Found" width="200" height="200"></td>
                 </tr>
             {% endfor %}
             </tbody>
