@@ -10,6 +10,8 @@ import numpy as np  # For storing data as numpy arrays
 import pandas as pd
 import timeit
 from pycm import *
+from mlxtend.evaluate import confusion_matrix
+from mlxtend.plotting import plot_confusion_matrix
 # %%-----------------------------------------------------------------------
 
 # importing torch packages
@@ -19,6 +21,7 @@ import torchvision.transforms as transforms
 from PIL import Image  # For handling the images
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
+
 
 
 # %matplotlib inline
@@ -151,7 +154,8 @@ def test(model, device, test_loader, criterion, epoch):
     loss_list = []
     all_predicted = []
     all_labels = []
-    classes = ('10_down', '04_fist_moved', '01_palm', '05_thumb', '02_l', '09_c', '08_palm_moved', '07_ok', '03_fist', '06_index')
+    classes = (
+    '10_down', '04_fist_moved', '01_palm', '05_thumb', '02_l', '09_c', '08_palm_moved', '07_ok', '03_fist', '06_index')
     with torch.no_grad():
         correct = 0
         total = 0
@@ -174,37 +178,35 @@ def test(model, device, test_loader, criterion, epoch):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
             for item in predicted.cpu().numpy():
-            	all_predicted.append(item)
-
+                all_predicted.append(item)
 
         print('Test Accuracy of the model on the 3000 test images: {} %'.format(100 * correct / total))
         accuracy = 100 * correct / total
-	
-	
-        all_labels_array = np.array(all_labels).reshape(-1,)
-        all_predicted_array = np.array(all_predicted).reshape(-1,)
+
+        all_labels_array = np.array(all_labels).reshape(-1, )
+        all_predicted_array = np.array(all_predicted).reshape(-1, )
 
         my_dict = dict(list(enumerate(classes)))
 
-        print(all_labels_array)
-        print(all_predicted_array)
-        print("My dict=",my_dict)
+        # print(all_labels_array)
+        # print(all_predicted_array)
+        # print("My dict=", my_dict)
         all_labels_vect = np.vectorize(my_dict.get)(all_labels_array)
-        print(all_labels_vect)
+        # print(all_labels_vect)
         all_predicted_vect = np.vectorize(my_dict.get)(all_predicted_array)
 
         # Create CM From Data
-        cm = ConfusionMatrix(predict_vector=all_predicted_vect, actual_vector=all_labels_vect)
+        cm1 = ConfusionMatrix(predict_vector=all_predicted_vect, actual_vector=all_labels_vect)
 
         # Create CM From Data
-        cm1 = ConfusionMatrix(actual_vector=all_labels_array, predict_vector=all_predicted_array)
-
+        #cm1 = ConfusionMatrix(actual_vector=all_labels_array, predict_vector=all_predicted_array)
+        cm = confusion_matrix(y_target=all_labels_array, y_predicted=all_predicted_array, binary=False)
         # print(cm.F1)
         # print(cm1)
 
         # print(type(cm.F1))
         # print(type(cm1))
-    return accuracy, loss_list, cm
+    return accuracy, loss_list, cm, cm1
 
 
 # %%-----------------------------------------------------------------------
@@ -275,6 +277,7 @@ def main():
 
     results = {}
     resultsDF = []
+    f1DF = []
 
     for BATCH_SIZE in batch_size_list:
 
@@ -300,7 +303,7 @@ def main():
 
         # specify the number of epochs and learning rate
         learning_rate_list = [0.001]
-        optimizer_functions_list = ['Adam', 'Adadelta']
+        optimizer_functions_list = ['Adam']
 
         for LEARNING_RATE in learning_rate_list:
 
@@ -339,7 +342,7 @@ def main():
                         validation_loss = validation_loss + val_loss
                         mean_training_loss = mean_training_loss + [np.mean(train_loss)]
                         mean_validation_loss = mean_validation_loss + [np.mean(val_loss)]
-                        accuracy, testing_loss, cm = test(model, device, test_loader, criterion, epoch)
+                        accuracy, testing_loss, cm, cm1 = test(model, device, test_loader, criterion, epoch)
 
                     fig1 = plt.figure(figsize=(12, 8))
                     plt.plot(training_loss)
@@ -380,29 +383,17 @@ def main():
                     fig3.savefig("testing_loss_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
                                  "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
 
-                    # Create CM From Data
-                    # class_labels = cm.table
-                    # cm_MAT = np.zeros((10, 10))
-                    #
-                    # print("class_labels",class_labels)
-                    # print(len(class_labels))
-                    #
-                    # fig4 = plt.figure(figsize=(12, 8))
-                    # for i in range(10):
-                    #     for j in range(10):
-                    #         cm_MAT[i, j] = class_labels[i][j]
-                    # plt.imshow(cm_MAT, interpolation='nearest', cmap=plt.cm.Greys)
-                    # plt.xticks(np.arange(10), classes , rotation=45)
-                    # plt.yticks(np.arange(10), classes)
-                    # plt.ylabel('True Label', fontsize=20)
-                    # plt.xlabel('Predicted  Label', fontsize=20)
-                    # plt.title("confusion matrix", fontsize=20)
-                    # fig4.savefig("confusion_matrix_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
-                    #              "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
+                    fig4, ax = plot_confusion_matrix(conf_mat=cm)
+                    #plt.show()
 
+                    print(type(cm1.F1))
+                    print("f1",cm1.F1)
 
+                    fig4.savefig("confusion_matrix_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
+                                 "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
 
-                    results[(BATCH_SIZE, LEARNING_RATE, OPTIMIZER, NUM_EPOCHS)] = (round(stop - start, 2), round(accuracy, 2))
+                    results[(BATCH_SIZE, LEARNING_RATE, OPTIMIZER, NUM_EPOCHS)] = (
+                    round(stop - start, 2), round(accuracy, 2))
 
                     print(results)
 
@@ -411,24 +402,28 @@ def main():
                         pdf.savefig(fig)
                     pdf.close()
 
-                    # with open('dict.csv', 'w') as csv_file:
-                    #     writer = csv.writer(csv_file)
-                    #     for key, value in results.items():
-                    #         writer.writerow([key, value])
 
                 df = pd.DataFrame(list(results.items()))
-                df1 = pd.DataFrame(df.iloc[:, 0].tolist(), columns=['batch_size', 'learning_rate', 'optimizer_method', 'num_epochs'])
-                df2 = pd.DataFrame(df.iloc[:, 1].tolist(), columns=['time', 'accuracy'])
-                df3 = pd.concat([df1, df2], axis=1)
+                df_parameters = pd.DataFrame(df.iloc[:, 0].tolist(),
+                                   columns=['batch_size', 'learning_rate', 'optimizer_method', 'num_epochs'])
+                df_obs = pd.DataFrame(df.iloc[:, 1].tolist(), columns=['time', 'accuracy'])
+                df_final = pd.concat([df_parameters, df_obs], axis=1)
 
-                df3.to_csv("df3.csv")
+                df_final.to_csv("df_final.csv")
 
-                resultsDF.append(df3)
+                df_f1 = pd.DataFrame(list(cm1.F1.items()),columns=['labels', 'f1_score'])
 
+                resultsDF.append(df_final)
+                f1DF.append(df_f1)
 
     df_results = pd.concat(resultsDF)
-    df_results.drop_duplicates(keep=False)
-    df_results.to_csv("results1.csv")
+
+    df_results = df_results.drop_duplicates(keep='first', inplace=False)
+    df_results.to_csv("results.csv")
+
+    df_f1_results = pd.concat(f1DF)
+    df_f1_results.to_csv("f1_score_results.csv")
+
 # %%-----------------------------------------------------------------------
 
 if __name__ == '__main__':
