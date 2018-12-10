@@ -28,10 +28,11 @@ from torch.utils.data import Dataset
 
 
 # %%-----------------------------------------------------------------------
-# os.system("wget https://s3.amazonaws.com/dataml2/leapGestRecog.tar.gz")
-# os.system("mkdir data")
-# os.system(tar -xf  leapGestRecog.tar.gz -C ~/MachineLearning2_Project/data
-# specify the class for preprocessing the data
+os.system("wget https://s3.amazonaws.com/dataml2/leapGestRecog.tar.gz")
+if(not os.path.exists("./data")):
+    os.system("mkdir data")
+os.system("tar -xf  leapGestRecog.tar.gz -C ./data")
+#specify the class for preprocessing the data
 class DatasetProcessing(Dataset):
     """
     This function is used to initialise the class variables - transform, data, target
@@ -219,7 +220,7 @@ def main():
     lookup = dict()
     reverselookup = dict()
     count = 0
-    for j in os.listdir('../data/leapGestRecog/00/'):
+    for j in os.listdir('./data/leapGestRecog/00/'):
         if not j.startswith('.'):  # If running this code locally, this is to
             # ensure you aren't reading in hidden folders
             lookup[j] = count
@@ -233,13 +234,13 @@ def main():
     label_data = []
     imagecount = 0  # total Image count
     for i in range(0, 10):  # Loop over the ten top-level folders
-        for j in os.listdir('../data/leapGestRecog/0' + str(i) + '/'):
+        for j in os.listdir('./data/leapGestRecog/0' + str(i) + '/'):
             if not j.startswith('.'):  # Again avoid hidden folders
                 count = 0  # To tally images of a given gesture
                 # loop over the images
                 # read in and convert to greyscale
-                for k in os.listdir('../data/leapGestRecog/0' + str(i) + '/' + j + '/'):
-                    img = Image.open('../data/leapGestRecog/0' +
+                for k in os.listdir('./data/leapGestRecog/0' + str(i) + '/' + j + '/'):
+                    img = Image.open('./data/leapGestRecog/0' +
                                      str(i) + '/' + j + '/' + k).convert('L')
                     img = img.resize((320, 120))
                     arr = np.array(img)
@@ -254,24 +255,24 @@ def main():
     label_data = label_data.reshape(imagecount, 1)  # Reshape to be the correct size
 
     # check the shape of train data
-    print(x_data.shape)
-    print(label_data)
+    print("Total Data shape",x_data.shape)
+    print("Total labels shape",label_data)
 
     # divide the data into train, validation and test
     x_train, x_valid_test, y_train, y_valid_test = train_test_split(x_data, label_data, test_size=0.3)
     x_validate, x_test, y_validate, y_test = train_test_split(x_valid_test, y_valid_test, test_size=0.5)
 
     # check the shape of train data
-    print(x_train.shape)
-    print(y_train.shape)
+    print("Train Data shape=",x_train.shape)
+    print("Train Labels shape=",y_train.shape)
 
     # check the shape of validation data
-    print(x_validate.shape)
-    print(y_validate.shape)
+    print("Validation data shape=",x_validate.shape)
+    print("Validation labels shape=",y_validate.shape)
 
     # check the shape of test data
-    print(x_test.shape)
-    print(y_test.shape)
+    print("Test data shape=",x_test.shape)
+    print("Test data label=",y_test.shape)
 
     batch_size_list = [64]
 
