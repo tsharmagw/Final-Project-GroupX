@@ -188,11 +188,11 @@ def test(model, device, test_loader, criterion, epoch):
 
         my_dict = dict(list(enumerate(classes)))
 
-        # print(all_labels_array)
-        # print(all_predicted_array)
-        # print("My dict=", my_dict)
+        #print(all_labels_array)
+        #print(all_predicted_array)
+        #print("My dict=", my_dict)
         all_labels_vect = np.vectorize(my_dict.get)(all_labels_array)
-        # print(all_labels_vect)
+        #print(all_labels_vect)
         all_predicted_vect = np.vectorize(my_dict.get)(all_predicted_array)
 
         # Create CM From Data
@@ -273,7 +273,7 @@ def main():
     print(x_test.shape)
     print(y_test.shape)
 
-    batch_size_list = [64]
+    batch_size_list = [128,64,32]
 
     results = {}
     resultsDF = []
@@ -302,8 +302,8 @@ def main():
         test_loader = torch.utils.data.DataLoader(data_test, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         # specify the number of epochs and learning rate
-        learning_rate_list = [0.001]
-        optimizer_functions_list = ['Adam']
+        learning_rate_list = [0.1, 0.01, 0.001]
+        optimizer_functions_list = ['Adam', 'Adadelta']
 
         for LEARNING_RATE in learning_rate_list:
 
@@ -325,7 +325,7 @@ def main():
                 elif OPTIMIZER == 'RMSProp':
                     optimizer = torch.optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
 
-                number_epochs_list = [2]
+                number_epochs_list = [2, 5, 10]
 
                 for NUM_EPOCHS in number_epochs_list:
                     training_loss = []
@@ -386,16 +386,12 @@ def main():
                     fig4, ax = plot_confusion_matrix(conf_mat=cm)
                     #plt.show()
 
-                    print(type(cm1.F1))
-                    print("f1",cm1.F1)
-
                     fig4.savefig("confusion_matrix_" + str(BATCH_SIZE) + "_" + str(LEARNING_RATE) +
                                  "_" + str(OPTIMIZER) + "_" + str(NUM_EPOCHS) + ".png")
 
                     results[(BATCH_SIZE, LEARNING_RATE, OPTIMIZER, NUM_EPOCHS)] = (
                     round(stop - start, 2), round(accuracy, 2))
 
-                    print(results)
 
                     pdf = matplotlib.backends.backend_pdf.PdfPages("output.pdf")
                     for fig in range(1, plt.gcf().number + 1):  ## will open an empty extra figure
@@ -404,25 +400,29 @@ def main():
 
 
                 df = pd.DataFrame(list(results.items()))
-                df_parameters = pd.DataFrame(df.iloc[:, 0].tolist(),
+                df1 = pd.DataFrame(df.iloc[:, 0].tolist(),
                                    columns=['batch_size', 'learning_rate', 'optimizer_method', 'num_epochs'])
-                df_obs = pd.DataFrame(df.iloc[:, 1].tolist(), columns=['time', 'accuracy'])
-                df_final = pd.concat([df_parameters, df_obs], axis=1)
+                df2 = pd.DataFrame(df.iloc[:, 1].tolist(), columns=['time', 'accuracy'])
+                df3 = pd.concat([df1, df2], axis=1)
 
-                df_final.to_csv("df_final.csv")
+                df3.to_csv("df3.csv")
+
+
 
                 df_f1 = pd.DataFrame(list(cm1.F1.items()),columns=['labels', 'f1_score'])
 
-                resultsDF.append(df_final)
+                resultsDF.append(df3)
                 f1DF.append(df_f1)
 
     df_results = pd.concat(resultsDF)
 
     df_results = df_results.drop_duplicates(keep='first', inplace=False)
-    df_results.to_csv("results.csv")
+    df_results11 = df_results.drop_duplicates(keep='last', inplace=False)
 
-    df_f1_results = pd.concat(f1DF)
-    df_f1_results.to_csv("f1_score_results.csv")
+    df_results.to_csv("results.csv")
+    df_results11.to_csv("results_last.csv")
+    df_results1 = pd.concat(f1DF)
+    df_results1.to_csv("f1_score_results.csv")
 
 # %%-----------------------------------------------------------------------
 
