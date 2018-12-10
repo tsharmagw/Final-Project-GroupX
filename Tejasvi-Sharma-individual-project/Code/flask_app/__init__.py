@@ -41,7 +41,7 @@ def upload_file():
 @app.route('/output')
 def show_prediction():
     download_data()
-    download_path='/home/ubuntu/MachineLearning2_Project/flask_app/static'
+    download_path='/home/ubuntu/MachineLearning2_Project/Tejasvi-Sharma-individual-project/Code/flask_app/static'
     files = [f for f in os.listdir(download_path) if os.path.isfile(os.path.join(download_path, f))]
     print(files)
     return render_template(
@@ -52,7 +52,7 @@ def download_data():
     bucket='flaskdataml2output'
     s3_client=boto3.client('s3')
     s3=boto3.resource('s3')
-    download_path = '/home/ubuntu/MachineLearning2_Project/flask_app/static'
+    download_path ='/home/ubuntu/MachineLearning2_Project/Tejasvi-Sharma-individual-project/Code/flask_app/static'
     if(os.path.isdir(download_path)):
         shutil.rmtree(download_path)
     os.mkdir(download_path)
