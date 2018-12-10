@@ -68,7 +68,7 @@ class CNN(nn.Module):
 if __name__=="__main__":
 
     #code to read message from queue needs to be added
-    class_dict={9:'palm',7:'02_l',8:'fist',4:'fist_moved',6:'thumb',2:'index_finger',0:'ok',3:'palm_moved',5:'09_c',1:'10_down'}
+    class_dict={9:'palm',7:'L shape',8:'fist',4:'fist_moved',6:'thumb',2:'index_finger',0:'ok',3:'palm_moved',5:'C shape',1:'Down'}
     s3_client = boto3.resource('s3',
             aws_access_key_id='AKIAIAQS3KGWKQL4JJ7A',
             aws_secret_access_key='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',
